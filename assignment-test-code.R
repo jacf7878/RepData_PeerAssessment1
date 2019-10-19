@@ -1,28 +1,14 @@
----
-title: "Reproducible Research: Peer Assessment 1 - José Antonio - Coursera"
-output: 
-  html_document:
-    keep_md: true
----
-````{r messaga=FALSE}
+# Loading and preprocessing the data
         library(dplyr)
         library(ggplot2)
-
-````
-
-
-## Loading and preprocessing the data
-````{r}
         df <- read.csv("activity.csv", header=TRUE, sep=",", na.strings = "NA")
         dim(df)
         str(df)
         df$dateOK <- as.Date(df$date, "%Y-%m-%d")
         head(df)
 
-````
+#1.What is mean total number of steps taken per day?
 
-##1. What is mean total number of steps taken per day?
-````{r}
 #1.1 Calculate the total number of steps taken per day
         dfPerDay <- df %>% group_by(dateOK) %>% summarise(totalSteps = sum(steps, na.rm = TRUE))  
         head(dfPerDay)
@@ -43,11 +29,9 @@ output:
         #median per day
         dfMedianPerDay <- df %>% group_by(dateOK) %>% summarise(meanSteps = median(steps, na.rm = TRUE))  
         head(dfMedianPerDay)
+        
+#2.What is the average daily activity pattern?
 
-````
-
-##2. What is the average daily activity pattern?
-````{r}
 #2.1  Make a time series plot (i.e. type="l") of the 5-minute interval (x-axis) and the average 
 #number of steps taken, averaged across all days (y-axis)
         #calculate means per interval (across all days)
@@ -65,10 +49,8 @@ output:
         
         dfPerInterval[dfPerInterval$meanSteps == max(dfPerInterval$meanSteps),]
         
-````
+#3. Imputing missing values
 
-##3. Imputing missing values
-````{r}
 #3.1 Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
         sapply(df, function(x) sum(is.na(x)))
@@ -105,16 +87,13 @@ output:
         dfMedianPerDayOK <- dfOK %>% group_by(dateOK) %>% summarise(medianSteps = median(stepsOK))  
         head(dfMedianPerDayOK)
 
-
-````
-
-## Are there differences in activity patterns between weekdays and weekends?
-````{r}
+#4. Are there differences in activity patterns between weekdays and weekends?
+        
 #4.1 Create a new factor variable in the dataset with two levels – “weekday” and “weekend” 
 #indicating whether a given date is a weekday or weekend day.
         #instead of using weekdays function I prefer use as.POSIXlt()$wday construction
         dfOK <- dfOK %>% mutate(daytype = ifelse(as.POSIXlt(dfOK$dateOK)$wday==0,"weekend",ifelse(as.POSIXlt(dfOK$dateOK)$wday==6,"weekend","weekday")))                       
-        
+        View(dfOK)
 #4.2 Make a panel plot containing a time series plot (i.e.type="l") of the 5-minute interval 
 #(x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).        
         
@@ -127,7 +106,4 @@ output:
                 facet_grid(daytype~.) +
                 geom_line(color="blue", size=1) +
                 theme_minimal()
-   
-````
-
-
+        
